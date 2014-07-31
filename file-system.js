@@ -1,6 +1,10 @@
 define(function (require, exports) {
     "use strict";
 
+    var FileUtils           = require("file/FileUtils"),
+        FileSystemStats     = require("filesystem/FileSystemStats"),
+        FileSystemError     = require("filesystem/FileSystemError");
+
     var socket = require("/socket.io/socket.io.js").connect("/brackets");
 
     socket.on("greeting", function (data) {
@@ -66,10 +70,13 @@ define(function (require, exports) {
      * @param {function(?string, FileSystemStats=)} callback
      */
     function stat(path, callback) {
-        if (callback) {
-            return callback("Not implemented!");
-        }
-        throw "Not implemented!";
+        socket.emit("stat", path, function (res) {
+            if (res.err) {
+                callback(res.err);
+            } else {
+                callback(null, new FileSystemStats(res.stats));
+            }
+        });
     }
 
     /**
@@ -118,10 +125,18 @@ define(function (require, exports) {
      * @param {function(?string, FileSystemStats=)=} callback
      */
     function mkdir(path, mode, callback) {
-        if (callback) {
-            return callback("Not implemented!");
+        if (typeof mode === "function") {
+            callback = mode;
+            mode = parseInt("0755", 8);
         }
-        throw "Not implemented!";
+        socket.emit("mkdir", { path: path, mode: mode }, function (err) {
+            if (err) {
+                return callback(err);
+            }
+            stat(path, function (err, stat) {
+                callback(err, stat);
+            });
+        });
     }
 
     /**
