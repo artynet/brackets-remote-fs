@@ -1,6 +1,14 @@
 define(function (require, exports) {
     "use strict";
 
+    var socket = require("/socket.io/socket.io.js").connect("/brackets");
+
+    socket.on("greeting", function (data) {
+        if (data === "hi") {
+            console.log("Socket.io connected!");
+        }
+    });
+
     /**
      * Callback to notify FileSystem of watcher changes
      * @type {?function(string, FileSystemStats=)}
@@ -26,7 +34,10 @@ define(function (require, exports) {
      * @param {function(?string, Array.<string>=)} callback
      */
     function showOpenDialog(allowMultipleSelection, chooseDirectories, title, initialPath, fileTypes, callback) {
-        callback("Not implemented!");
+        if (callback) {
+            return callback("Not implemented!");
+        }
+        throw "Not implemented!";
     }
 
     /**
@@ -40,7 +51,10 @@ define(function (require, exports) {
      * @param {function(?string, string=)} callback
      */
     function showSaveDialog(title, initialPath, proposedNewFilename, callback) {
-        callback("Not implemented!");
+        if (callback) {
+            return callback("Not implemented!");
+        }
+        throw "Not implemented!";
     }
 
     /**
@@ -52,7 +66,10 @@ define(function (require, exports) {
      * @param {function(?string, FileSystemStats=)} callback
      */
     function stat(path, callback) {
-        callback("Not implemented!");
+        if (callback) {
+            return callback("Not implemented!");
+        }
+        throw "Not implemented!";
     }
 
     /**
@@ -66,7 +83,10 @@ define(function (require, exports) {
      * @param {function(?string, boolean)} callback
      */
     function exists(path, callback) {
-        callback("Not implemented!");
+        if (callback) {
+            return callback("Not implemented!");
+        }
+        throw "Not implemented!";
     }
 
     /**
@@ -81,7 +101,10 @@ define(function (require, exports) {
      * @param {function(?string, Array.<FileSystemEntry>=, Array.<string|FileSystemStats>=)} callback
      */
     function readdir(path, callback) {
-        callback("Not implemented!");
+        if (callback) {
+            return callback("Not implemented!");
+        }
+        throw "Not implemented!";
     }
 
     /**
@@ -95,7 +118,10 @@ define(function (require, exports) {
      * @param {function(?string, FileSystemStats=)=} callback
      */
     function mkdir(path, mode, callback) {
-        callback("Not implemented!");
+        if (callback) {
+            return callback("Not implemented!");
+        }
+        throw "Not implemented!";
     }
 
     /**
@@ -107,7 +133,10 @@ define(function (require, exports) {
      * @param {function(?string)=} callback
      */
     function rename(oldPath, newPath, callback) {
-        callback("Not implemented!");
+        if (callback) {
+            return callback("Not implemented!");
+        }
+        throw "Not implemented!";
     }
 
     /**
@@ -127,7 +156,10 @@ define(function (require, exports) {
      * @param {function(?string, string=, FileSystemStats=)} callback
      */
     function readFile(path, options, callback) {
-        callback("Not implemented!");
+        if (callback) {
+            return callback("Not implemented!");
+        }
+        throw "Not implemented!";
     }
 
     /**
@@ -148,7 +180,10 @@ define(function (require, exports) {
      * @param {function(?string, FileSystemStats=, boolean)} callback
      */
     function writeFile(path, data, options, callback) {
-        callback("Not implemented!");
+        if (callback) {
+            return callback("Not implemented!");
+        }
+        throw "Not implemented!";
     }
 
     /**
@@ -160,7 +195,10 @@ define(function (require, exports) {
      * @param {function(string)=} callback
      */
     function unlink(path, callback) {
-        callback("Not implemented!");
+        if (callback) {
+            return callback("Not implemented!");
+        }
+        throw "Not implemented!";
     }
 
     /**
@@ -172,7 +210,10 @@ define(function (require, exports) {
      * @param {function(string)=} callback
      */
     function moveToTrash(path, callback) {
-        callback("Not implemented!");
+        if (callback) {
+            return callback("Not implemented!");
+        }
+        throw "Not implemented!";
     }
 
     /**
@@ -208,7 +249,10 @@ define(function (require, exports) {
      * @param {function(?string)=} callback
      */
     function watchPath(path, callback) {
-        callback("Not implemented!");
+        if (callback) {
+            return callback("Not implemented!");
+        }
+        throw "Not implemented!";
     }
 
     /**
@@ -220,7 +264,10 @@ define(function (require, exports) {
      * @param {function(?string)=} callback
      */
     function unwatchPath(path, callback) {
-        callback("Not implemented!");
+        if (callback) {
+            return callback("Not implemented!");
+        }
+        throw "Not implemented!";
     }
 
     /**
@@ -231,7 +278,10 @@ define(function (require, exports) {
      * @param {function(?string)=} callback
      */
     function unwatchAll(callback) {
-        callback();
+        if (callback) {
+            return callback("Not implemented!");
+        }
+        throw "Not implemented!";
     }
 
     // Export public API
