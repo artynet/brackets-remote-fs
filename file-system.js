@@ -108,10 +108,27 @@ define(function (require, exports) {
      * @param {function(?string, Array.<FileSystemEntry>=, Array.<string|FileSystemStats>=)} callback
      */
     function readdir(path, callback) {
-        if (callback) {
-            return callback("Not implemented!");
-        }
-        throw "Not implemented!";
+        socket.emit("readdir", path, function (res) {
+            if (res.err) {
+                return callback(res.err);
+            }
+
+            var count = res.contents.length;
+            if (!count) {
+                return callback(null, [], []);
+            }
+
+            var stats = [];
+            res.contents.forEach(function (val, idx) {
+                stat(path + "/" + val, function (err, stat) {
+                    stats[idx] = err || stat;
+                    count--;
+                    if (count <= 0) {
+                        callback(null, res.contents, stats);
+                    }
+                });
+            });
+        });
     }
 
     /**
