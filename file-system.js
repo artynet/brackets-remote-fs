@@ -1,17 +1,8 @@
 define(function (require, exports) {
     "use strict";
 
-    var FileUtils           = require("file/FileUtils"),
-        FileSystemStats     = require("filesystem/FileSystemStats"),
+    var FileSystemStats     = require("filesystem/FileSystemStats"),
         FileSystemError     = require("filesystem/FileSystemError");
-
-    var socket = require("/socket.io/socket.io.js").connect("/brackets");
-
-    socket.on("greeting", function (data) {
-        if (data === "hi") {
-            console.log("Socket.io connected!");
-        }
-    });
 
     /**
      * Callback to notify FileSystem of watcher changes
@@ -24,6 +15,38 @@ define(function (require, exports) {
      * @type {?function()}
      */
     var _offlineCallback;
+
+    function _mapError(err) {
+        if (!err) {
+            return null;
+        }
+
+        switch (err) {
+        case "ERR_INVALID_PARAMS":
+            return FileSystemError.INVALID_PARAMS;
+        case "ERR_NOT_FOUND":
+            return FileSystemError.NOT_FOUND;
+        case "ERR_CANT_READ":
+            return FileSystemError.NOT_READABLE;
+        case "ERR_CANT_WRITE":
+            return FileSystemError.NOT_WRITABLE;
+        case "ERR_UNSUPPORTED_ENCODING":
+            return FileSystemError.UNSUPPORTED_ENCODING;
+        case "ERR_OUT_OF_SPACE":
+            return FileSystemError.OUT_OF_SPACE;
+        case "ERR_FILE_EXISTS":
+            return FileSystemError.ALREADY_EXISTS;
+        }
+        return FileSystemError.UNKNOWN;
+    }
+
+    var socket = require("/socket.io/socket.io.js").connect("/brackets");
+
+    socket.on("greeting", function (data) {
+        if (data === "hi") {
+            console.log("Socket.io connected!");
+        }
+    });
 
     /**
      * Display an open-files dialog to the user and call back asynchronously with
@@ -72,7 +95,7 @@ define(function (require, exports) {
     function stat(path, callback) {
         socket.emit("stat", path, function (res) {
             if (res.err) {
-                callback(res.err);
+                callback(_mapError(res.err));
             } else {
                 callback(null, new FileSystemStats(res.stats));
             }
@@ -90,10 +113,18 @@ define(function (require, exports) {
      * @param {function(?string, boolean)} callback
      */
     function exists(path, callback) {
-        if (callback) {
-            return callback("Not implemented!");
-        }
-        throw "Not implemented!";
+        stat(path, function (err) {
+            if (err) {
+                if (err === FileSystemError.NOT_FOUND) {
+                    callback(null, false);
+                } else {
+                    callback(err);
+                }
+                return;
+            }
+
+            callback(null, true);
+        });
     }
 
     /**
@@ -110,7 +141,7 @@ define(function (require, exports) {
     function readdir(path, callback) {
         socket.emit("readdir", path, function (res) {
             if (res.err) {
-                return callback(res.err);
+                return callback(_mapError(res.err));
             }
 
             var count = res.contents.length;
@@ -148,7 +179,7 @@ define(function (require, exports) {
         }
         socket.emit("mkdir", { path: path, mode: mode }, function (err) {
             if (err) {
-                return callback(err);
+                return callback(_mapError(err));
             }
             stat(path, function (err, stat) {
                 callback(err, stat);
@@ -165,10 +196,11 @@ define(function (require, exports) {
      * @param {function(?string)=} callback
      */
     function rename(oldPath, newPath, callback) {
-        if (callback) {
-            return callback("Not implemented!");
-        }
-        throw "Not implemented!";
+        socket.emit("rename", { oldPath: oldPath, newPath: newPath }, function (err) {
+            if (callback) {
+                callback(_mapError(err));
+            }
+        });
     }
 
     /**
@@ -188,10 +220,41 @@ define(function (require, exports) {
      * @param {function(?string, string=, FileSystemStats=)} callback
      */
     function readFile(path, options, callback) {
-        if (callback) {
-            return callback("Not implemented!");
+        var encoding = options.encoding || "utf8";
+
+        // Execute the read and stat calls in parallel. Callback early if the
+        // read call completes first with an error; otherwise wait for both
+        // to finish.
+        var done = false, data, fileStat, err;
+
+        if (options.stat) {
+            done = true;
+            fileStat = options.stat;
+        } else {
+            stat(path, function (_err, _stat) {
+                if (done) {
+                    callback(_err, _err ? null : data, _stat);
+                } else {
+                    done = true;
+                    fileStat = _stat;
+                    err = _err;
+                }
+            });
         }
-        throw "Not implemented!";
+
+        socket.emit("readFile", { path: path, encoding: encoding }, function (res) {
+            if (res.err) {
+                callback(_mapError(res.err));
+                return;
+            }
+
+            if (done) {
+                callback(err, err ? null : res.data, fileStat);
+            } else {
+                done = true;
+                data = res.data;
+            }
+        });
     }
 
     /**
@@ -212,10 +275,53 @@ define(function (require, exports) {
      * @param {function(?string, FileSystemStats=, boolean)} callback
      */
     function writeFile(path, data, options, callback) {
-        if (callback) {
-            return callback("Not implemented!");
+        var encoding = options.encoding || "utf8";
+
+        function _finishWrite(created) {
+            socket.emit("writeFile", { path: path, data: data, encoding: encoding }, function (err) {
+                if (err) {
+                    callback(_mapError(err));
+                } else {
+                    stat(path, function (err, stat) {
+                        callback(err, stat, created);
+                    });
+                }
+            });
         }
-        throw "Not implemented!";
+
+        stat(path, function (err, stats) {
+            if (err) {
+                switch (err) {
+                case FileSystemError.NOT_FOUND:
+                    _finishWrite(true);
+                    break;
+                default:
+                    callback(err);
+                }
+                return;
+            }
+
+            if (options.hasOwnProperty("expectedHash") && options.expectedHash !== stats._hash) {
+                console.error("Blind write attempted: ", path, stats._hash, options.expectedHash);
+
+                if (options.hasOwnProperty("expectedContents")) {
+                    readFile(path, options, function (_err, _data) {
+                        if (_err || _data !== options.expectedContents) {
+                            callback(FileSystemError.CONTENTS_MODIFIED);
+                            return;
+                        }
+
+                        _finishWrite(false);
+                    });
+                    return;
+                } else {
+                    callback(FileSystemError.CONTENTS_MODIFIED);
+                    return;
+                }
+            }
+
+            _finishWrite(false);
+        });
     }
 
     /**
@@ -227,10 +333,9 @@ define(function (require, exports) {
      * @param {function(string)=} callback
      */
     function unlink(path, callback) {
-        if (callback) {
-            return callback("Not implemented!");
-        }
-        throw "Not implemented!";
+        socket.emit("unlink", path, function (err) {
+            callback(_mapError(err));
+        });
     }
 
     /**
@@ -242,10 +347,9 @@ define(function (require, exports) {
      * @param {function(string)=} callback
      */
     function moveToTrash(path, callback) {
-        if (callback) {
-            return callback("Not implemented!");
-        }
-        throw "Not implemented!";
+        socket.emit("moveToTrash", path, function (err) {
+            callback(_mapError(err));
+        });
     }
 
     /**
