@@ -20,22 +20,21 @@ define(function (require, exports) {
         if (!err) {
             return null;
         }
-
-        switch (err) {
-        case "ERR_INVALID_PARAMS":
-            return FileSystemError.INVALID_PARAMS;
-        case "ERR_NOT_FOUND":
-            return FileSystemError.NOT_FOUND;
-        case "ERR_CANT_READ":
-            return FileSystemError.NOT_READABLE;
-        case "ERR_CANT_WRITE":
-            return FileSystemError.NOT_WRITABLE;
-        case "ERR_UNSUPPORTED_ENCODING":
-            return FileSystemError.UNSUPPORTED_ENCODING;
-        case "ERR_OUT_OF_SPACE":
-            return FileSystemError.OUT_OF_SPACE;
-        case "ERR_FILE_EXISTS":
-            return FileSystemError.ALREADY_EXISTS;
+        switch (err.code) {
+            case "ERR_INVALID_PARAMS":
+                return FileSystemError.INVALID_PARAMS;
+            case "ENOENT":
+                return FileSystemError.NOT_FOUND;
+            case "ERR_CANT_READ":
+                return FileSystemError.NOT_READABLE;
+            case "ERR_CANT_WRITE":
+                return FileSystemError.NOT_WRITABLE;
+            case "ERR_UNSUPPORTED_ENCODING":
+                return FileSystemError.UNSUPPORTED_ENCODING;
+            case "ENOSPC":
+                return FileSystemError.OUT_OF_SPACE;
+            case "EEXIST":
+                return FileSystemError.ALREADY_EXISTS;
         }
         return FileSystemError.UNKNOWN;
     }
