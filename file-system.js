@@ -39,7 +39,7 @@ define(function (require, exports) {
         return FileSystemError.UNKNOWN;
     }
 
-    var socket = require("/socket.io/socket.io.js").connect("/brackets");
+    var socket = require("socket.io").connect("/brackets");
 
     socket.on("greeting", function (data) {
         if (data === "hi") {
