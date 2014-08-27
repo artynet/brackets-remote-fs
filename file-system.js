@@ -96,6 +96,7 @@ define(function (require, exports) {
             if (res.err) {
                 callback(_mapError(res.err));
             } else {
+                res.stats.mtime = new Date(res.stats.mtime);
                 callback(null, new FileSystemStats(res.stats));
             }
         });
