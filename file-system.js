@@ -178,12 +178,12 @@ define(function (require, exports) {
             mode = parseInt("0755", 8);
         }
         socket.emit("mkdir", { path: path, mode: mode }, function (err) {
-            if (err) {
-                return callback(_mapError(err));
+            if (callback) {
+                if (err) {
+                    return callback(_mapError(err));
+                }
+                stat(path, callback);
             }
-            stat(path, function (err, stat) {
-                callback(err, stat);
-            });
         });
     }
 
@@ -334,7 +334,9 @@ define(function (require, exports) {
      */
     function unlink(path, callback) {
         socket.emit("unlink", path, function (err) {
-            callback(_mapError(err));
+            if (callback) {
+                callback(_mapError(err));
+            }
         });
     }
 
@@ -348,7 +350,9 @@ define(function (require, exports) {
      */
     function moveToTrash(path, callback) {
         socket.emit("moveToTrash", path, function (err) {
-            callback(_mapError(err));
+            if (callback) {
+                callback(_mapError(err));
+            }
         });
     }
 
@@ -385,10 +389,11 @@ define(function (require, exports) {
      * @param {function(?string)=} callback
      */
     function watchPath(path, callback) {
-        if (callback) {
-            return callback("Not implemented!");
-        }
-        throw "Not implemented!";
+        socket.emit("watchPath", path, function (err) {
+            if (callback) {
+                callback(_mapError(err));
+            }
+        });
     }
 
     /**
@@ -400,10 +405,11 @@ define(function (require, exports) {
      * @param {function(?string)=} callback
      */
     function unwatchPath(path, callback) {
-        if (callback) {
-            return callback("Not implemented!");
-        }
-        throw "Not implemented!";
+        socket.emit("unwatchPath", path, function (err) {
+            if (callback) {
+                callback(_mapError(err));
+            }
+        });
     }
 
     /**
@@ -414,10 +420,19 @@ define(function (require, exports) {
      * @param {function(?string)=} callback
      */
     function unwatchAll(callback) {
-        if (callback) {
-            return callback("Not implemented!");
-        }
-        throw "Not implemented!";
+        socket.emit("unwatchAll", "", function (err) {
+            if (callback) {
+                callback(_mapError(err));
+            }
+        });
+    }
+
+    function copyFile(srcPath, destPath, callback) {
+        socket.emit("copyFile", { src: srcPath, dest: destPath}, function (err) {
+            if (callback) {
+                callback(_mapError(err));
+            }
+        });
     }
 
     // Export public API
@@ -436,6 +451,7 @@ define(function (require, exports) {
     exports.watchPath       = watchPath;
     exports.unwatchPath     = unwatchPath;
     exports.unwatchAll      = unwatchAll;
+    exports.copyFile        = copyFile;
 
     /**
      * Indicates whether or not recursive watching notifications are supported
