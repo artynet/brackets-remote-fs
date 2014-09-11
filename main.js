@@ -1,10 +1,10 @@
 define(function (require, exports, module) {
     "use strict";
 
-    var CommandManager = brackets.getModule("command/CommandManager"),
-        EditorManager  = brackets.getModule("editor/EditorManager"),
-        Menus          = brackets.getModule("command/Menus"),
-        FileSystem     = brackets.getModule("filesystem/FileSystem");
+    var CommandManager  = brackets.getModule("command/CommandManager"),
+        EditorManager   = brackets.getModule("editor/EditorManager"),
+        Menus           = brackets.getModule("command/Menus"),
+        fsImpl          = brackets.getModule("fileSystemImpl");
 
 
     // Function to run when the menu item is clicked
@@ -26,5 +26,7 @@ define(function (require, exports, module) {
     var menu = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
     menu.addMenuItem(MY_COMMAND_ID);
 
-
+    if (fsImpl._setDialogs) {
+        fsImpl._setDialogs(require("./lib/open-dialog"), require("./lib/save-dialog"));
+    }
 });
