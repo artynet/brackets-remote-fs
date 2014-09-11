@@ -84,6 +84,7 @@
     // Custom Globals
     "globals"       : {
         "brackets"  : true,
-        "define"    : true
+        "define"    : true,
+        "Mustache"   : true
     }        // additional predefined global variables
 }
