@@ -1,4 +1,4 @@
-define(function (require, exports, module) {
+define(function (require) {
     "use strict";
 
     var CommandManager  = brackets.getModule("command/CommandManager"),
@@ -16,6 +16,10 @@ define(function (require, exports, module) {
         }
     }
 
+    function wrapFs() {
+        // TODO: Wrap the native file system and bind socket-io-fs.
+    }
+
 
     // First, register a command - a UI-less object associating an id to a handler
     var MY_COMMAND_ID = "helloworld.writehello";   // package-style naming to avoid collisions
@@ -27,6 +31,12 @@ define(function (require, exports, module) {
     menu.addMenuItem(MY_COMMAND_ID);
 
     if (fsImpl._setDialogs) {
+        // This means we are running in hosted Brackets and socket-io-fs is already bound.
+        // We still have to set the dialogs.
         fsImpl._setDialogs(require("./lib/open-dialog"), require("./lib/save-dialog"));
+    } else {
+        // We are running on native OS shell.
+
+        wrapFs();
     }
 });
