@@ -1,9 +1,10 @@
-define(function (require) {
+define(function (require, exports, module) {
     "use strict";
 
     var CommandManager  = brackets.getModule("command/CommandManager"),
         EditorManager   = brackets.getModule("editor/EditorManager"),
         Menus           = brackets.getModule("command/Menus"),
+        ExtensionUtils  = brackets.getModule("utils/ExtensionUtils"),
         fsImpl          = brackets.getModule("fileSystemImpl");
 
 
@@ -29,6 +30,8 @@ define(function (require) {
     // The label of the menu item is the name we gave the command (see above)
     var menu = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
     menu.addMenuItem(MY_COMMAND_ID);
+
+    ExtensionUtils.loadStyleSheet(module, "styles/dialog.less");
 
     if (fsImpl._setDialogs) {
         // This means we are running in hosted Brackets and socket-io-fs is already bound.
