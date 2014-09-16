@@ -6,10 +6,10 @@
         <table class="bottom-panel-table table table-striped table-condensed row-highlight">
             <tbody>
                 {{#files}}
-                <tr class="modified-file" x-file="{{file}}" x-status="{{status}}">
+                <tr class="modified-file">
                     <td class="checkbox-column"><input type="checkbox" class="check-one" value="{{fullPath}}" /></td>
-                    <td class="icons-column dir">
-                        &nbsp;
+                    <td class="icons-column">
+                        <div class="sfs-icon {{type}}">&nbsp;</div>
                     </td>
                     <td>{{name}}</td>
                 </tr>
