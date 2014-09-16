@@ -7,9 +7,9 @@
             <tbody>
                 {{#files}}
                 <tr class="modified-file" x-file="{{file}}" x-status="{{status}}">
-                    <td class="checkbox-column"><input type="checkbox" class="check-one" /></td>
-                    <td class="icons-column">
-                        {{type}}
+                    <td class="checkbox-column"><input type="checkbox" class="check-one" value="{{fullPath}}" /></td>
+                    <td class="icons-column dir">
+                        &nbsp;
                     </td>
                     <td>{{name}}</td>
                 </tr>
