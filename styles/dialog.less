@@ -1,5 +1,6 @@
 #sfs-files-dialog {
     td {
+        background-color: var(--linkColor);
         &.checkbox-column {
             vertical-align: middle;
             width: 13px;
@@ -13,12 +14,21 @@
             width: 100%;
             vertical-align: middle;
         }
+        &.selected {
+            background-color: #288edf;
+            color: #fff;
+        }
     }
 }
 
+.sfs-file {
+}
+
 .sfs-icon {
+    background-size: 100%;
     width: 24px;
     height: 24px;
+    position: absolute;
     &.dir {
         background: url("icons/folder.svg") no-repeat 0 0;
     }
