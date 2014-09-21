@@ -1,10 +1,9 @@
 <table class="bottom-panel-table table table-striped table-condensed row-highlight">
     <tbody>
         {{#files}}
-        <tr class="rfs-file" id="{{fullPath}}">
-            {{#multiSelect}}{{#isFile}}<td class="checkbox-column"><input type="checkbox" class="check-one" value="{{fullPath}}" /></td>{{/isFile}}{{/multiSelect}}
+        <tr class="rfs-file {{disabled}}" id="{{fullPath}}">
             <td class="icons-column">
-                <div class="rfs-icon {{type}}"></div>
+                <div class="rfs-icon {{type}}" {{#isDirectory}}title="{{OPEN_FOLDER}}"{{/isDirectory}}  ></div>
             </td>
             <td>{{name}}</td>
         </tr>

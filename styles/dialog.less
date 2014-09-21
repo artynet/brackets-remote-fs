@@ -1,6 +1,5 @@
 #rfs-open-files-dialog {
     td {
-        background-color: var(--linkColor);
         &.checkbox-column {
             vertical-align: middle;
             width: 13px;
@@ -24,6 +23,17 @@
 .rfs-file {
 }
 
+.rfs-disabled {
+    tr {
+        &:hover {
+            background-color: rgba(0, 0, 0, 0) !important;
+        }
+    }
+    td {
+        color: #a3a3a3 !important;
+    }
+}
+
 .rfs-icon {
     background-size: 100%;
     width: 24px;
@@ -31,6 +41,14 @@
     position: absolute;
     &.dir {
         background: url("icons/folder.svg") no-repeat 0 0;
+        background-color: rgba(0, 0, 0, 0.1);
+        border: 1px solid;
+        border-radius: 3px;
+        border-color: rgba(0, 0, 0, 0.3);
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-color: rgba(0, 0, 0, 0.4);
+        }
     }
     &.file {
         background: url("icons/file.svg") no-repeat 0 0;
