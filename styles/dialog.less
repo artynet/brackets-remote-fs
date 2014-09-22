@@ -20,6 +20,41 @@
     }
 }
 
+#rfs-trail {
+    overflow-x: scroll;
+    ul {
+        padding: 0;
+        margin: 0;
+    }
+    li {
+        display: inline;
+        line-height: 30px;
+        white-space: nowrap;
+        list-style-type: none;
+        margin-left: 3px;
+        padding: 5px  10px 5px 10px;
+        border: 1px solid;
+        border-radius: 3px;
+        border-color: rgba(0, 0, 0, 0.3);
+        background-color: rgba(0, 0, 0, 0.1);
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-color: rgba(0, 0, 0, 0.4);
+        }
+        &.curr {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-color: rgba(0, 0, 0, 0.4);
+        }
+    }
+}
+
+#rfs-files-list {
+    position: relative;
+    overflow-y: auto;
+    min-height: 200px;
+    max-height: 200px;
+}
+
 .rfs-file {
 }
 
