@@ -1,9 +1,10 @@
 <div id="rfs-files-dialog" class="modal">
     <div class="modal-header">
-        <h1 class="dialog-title">{{TITLE}}</h1>
+        <h1 class="dialog-title">{{TITLE}}</h1><span id="rfs-save-name"></span>
     </div>
     <div class="modal-body">
         <label for="rfs-file-name">{{LABEL_FILE_NAME}}</label><input type="text" id="rfs-file-name" value="{{proposed}}" />
+        <button id="rfs-create-folder" class="dialog-button btn right">{{BUTTON_CREATE_FOLDER}}</button>
         <div id="rfs-contents"></div>
     </div>
     <div class="modal-footer">
