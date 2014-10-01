@@ -1,4 +1,4 @@
-socket-io-fs
+brackets-remote-fs
 ============
 
-Brackets extension - Remote file system via Socket.IO.
+Brackets extension - Remote file system.
