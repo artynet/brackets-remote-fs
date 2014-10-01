@@ -6,5 +6,6 @@ define({
     BUTTON_CREATE_FOLDER    : "Create Folder ...",
     BUTTON_OK               : "OK",
     LABEL_FILE_NAME         : "Name:",
-    LABEL_FOLDER_NAME       : "Folder Name"
+    LABEL_FOLDER_NAME       : "Folder Name",
+    MSG_FILE_EXISTS         : "There is already a file with the same name!"
 });
