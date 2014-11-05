@@ -29,17 +29,15 @@ define(function (require, exports, module) {
 
     ExtensionUtils.loadStyleSheet(module, "styles/dialog.less");
 
-    function wrapFs() {
-        // TODO: Wrap the native file system and bind remote-fs.
-    }
-
     if (fsImpl._setDialogs) {
         // This means we are running in hosted Brackets and remote-fs is already bound.
         // We still have to set the dialogs.
         fsImpl._setDialogs(require("./lib/open-dialog"), require("./lib/save-dialog"));
     } else {
         // We are running on native OS shell.
+        var FileSystem  = brackets.getModule("filesystem/FileSystem"),
+            wrapper     = require("./lib/fs-wrapper");
 
-        wrapFs();
+        FileSystem.init(wrapper);
     }
 });
