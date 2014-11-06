@@ -1,31 +1,15 @@
 define(function (require, exports, module) {
     "use strict";
 
-    var //EditorManager   = brackets.getModule("editor/EditorManager"),
-//        CommandManager  = brackets.getModule("command/CommandManager"),
-//        Menus           = brackets.getModule("command/Menus"),
-        ExtensionUtils  = brackets.getModule("utils/ExtensionUtils"),
-        fsImpl          = brackets.getModule("fileSystemImpl");
-
-
-//    // Function to run when the menu item is clicked
-//    function handleHelloWorld() {
-//        var editor = EditorManager.getFocusedEditor();
-//        if (editor) {
-//            var insertionPos = editor.getCursorPos();
-//            editor.document.replaceRange("Hello, world!", insertionPos);
-//        }
-//    }
-
-
-//    // First, register a command - a UI-less object associating an id to a handler
-//    var MY_COMMAND_ID = "helloworld.writehello";   // package-style naming to avoid collisions
-//    CommandManager.register("Hello World 2", MY_COMMAND_ID, handleHelloWorld);
-//
-//    // Then create a menu item bound to the command
-//    // The label of the menu item is the name we gave the command (see above)
-//    var menu = Menus.getMenu(Menus.AppMenuBar.FILE_MENU);
-//    menu.addMenuItem(MY_COMMAND_ID);
+    var CommandManager      = brackets.getModule("command/CommandManager"),
+        Commands            = brackets.getModule("command/Commands"),
+        Menus               = brackets.getModule("command/Menus"),
+        ExtensionUtils      = brackets.getModule("utils/ExtensionUtils"),
+        fsImpl              = brackets.getModule("fileSystemImpl"),
+        Strings             = require("./strings"),
+        OPEN_CMD_ID         = "remoteFS.open",
+        OPEN_FLDR_CMD_ID    = "remoteFS.openFolder",
+        SAVE_AS_CMD_ID      = "remoteFS.saveAs";
 
     ExtensionUtils.loadStyleSheet(module, "styles/dialog.less");
 
@@ -36,8 +20,19 @@ define(function (require, exports, module) {
     } else {
         // We are running on native OS shell.
         var FileSystem  = brackets.getModule("filesystem/FileSystem"),
-            wrapper     = require("./lib/fs-wrapper");
+            wrapper     = require("./lib/fs-wrapper"),
+            menu        = Menus.getMenu(Menus.AppMenuBar.FILE_MENU),
+            handler     = function () {};
 
         FileSystem.init(wrapper);
+
+        CommandManager.register(Strings.MENU_OPEN, OPEN_CMD_ID, handler);
+        CommandManager.register(Strings.MENU_OPEN_FOLDER, OPEN_FLDR_CMD_ID, handler);
+        CommandManager.register(Strings.MENU_SAVE_AS, SAVE_AS_CMD_ID, handler);
+
+        menu.addMenuItem(SAVE_AS_CMD_ID, "", Menus.AFTER, Commands.FILE_SAVE_AS);
+        menu.addMenuItem(OPEN_FLDR_CMD_ID, "", Menus.AFTER, Commands.FILE_SAVE_AS);
+        menu.addMenuItem(OPEN_CMD_ID, "", Menus.AFTER, Commands.FILE_SAVE_AS);
+        menu.addMenuDivider(Menus.AFTER, Commands.FILE_SAVE_AS);
     }
 });
